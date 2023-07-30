@@ -46,7 +46,7 @@ func (c userController) createUser(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&request); err != nil {
 		resp.StatusCode = fiber.StatusBadRequest
 		resp.Error = true
-		resp.Message = err.Error()
+		resp.Message = utils.StatusText(fiber.StatusBadRequest)
 
 		return ctx.Status(fiber.StatusBadRequest).JSON(resp)
 	}
