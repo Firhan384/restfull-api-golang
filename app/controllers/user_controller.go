@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"github.com/Firhan384/restfull-api-golang/app/database"
+	dto "github.com/Firhan384/restfull-api-golang/app/dto/user"
+	"github.com/Firhan384/restfull-api-golang/app/repository"
 	"github.com/Firhan384/restfull-api-golang/app/schemas"
 	services "github.com/Firhan384/restfull-api-golang/app/services/user"
+	"github.com/Firhan384/restfull-api-golang/app/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,15 +14,19 @@ type userController struct {
 	service services.UserService
 }
 
-func NewUserController(service services.UserService) userController {
+func NewUserController() userController {
+	repository := repository.NewUserRepo(database.DB)
+	service := services.NewUserService(repository)
+
 	return userController{service: service}
 }
 
 func (c userController) Route(app *fiber.App) {
-	app.Get("/api/user", getUsers)
+	app.Get("/api/user", c.getUsers)
+	app.Post("/api/user", c.createUser)
 }
 
-func getUsers(c *fiber.Ctx) error {
+func (c userController) getUsers(ctx *fiber.Ctx) error {
 	resp := schemas.NewResponseApi()
 	resp.StatusCode = fiber.StatusOK
 	resp.Message = "I'm a GET request!"
@@ -27,5 +35,36 @@ func getUsers(c *fiber.Ctx) error {
 		"email": "arjun",
 	}
 
-	return c.Status(resp.StatusCode).JSON(resp)
+	return ctx.Status(resp.StatusCode).JSON(resp)
+}
+
+func (c userController) createUser(ctx *fiber.Ctx) error {
+	resp := schemas.NewResponseApi()
+	request := new(dto.CreateUserDTO)
+
+	// check json
+	if err := ctx.BodyParser(&request); err != nil {
+		resp.StatusCode = fiber.StatusBadRequest
+		resp.Error = true
+		resp.Message = err.Error()
+
+		return ctx.Status(fiber.StatusBadRequest).JSON(resp)
+	}
+
+	validate := utils.NewValidator()
+
+	// check validator
+	if err := validate.Struct(request); err != nil {
+		resp.StatusCode = fiber.StatusBadRequest
+		resp.Error = true
+		resp.DetailMessage = utils.ValidatorErrors(err)
+		resp.Message = fiber.ErrBadRequest.Error()
+
+		return ctx.Status(fiber.StatusBadRequest).JSON(resp)
+	}
+
+	// call the business logic
+	service := c.service.CreateUser(request)
+
+	return ctx.Status(service.StatusCode).JSON(service)
 }

@@ -18,10 +18,7 @@ func main() {
 	fmt.Println(banner.Inline(configApp.AppName))
 
 	// config fiber
-	app := fiber.New(fiber.Config{
-		AppName:               configApp.AppName,
-		DisableStartupMessage: true,
-	})
+	app := fiber.New(configs.NewConfigFiber(configApp))
 
 	wrap.Bootstrap(app)
 

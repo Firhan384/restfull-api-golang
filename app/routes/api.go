@@ -8,7 +8,7 @@ import (
 
 func RegisterRouteAPI(app *fiber.App) {
 	// register route in controller
-	user := controllers.NewUserController(app)
+	user := controllers.NewUserController()
 	user.Route(app)
 
 	// list all routes
