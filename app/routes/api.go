@@ -7,9 +7,12 @@ import (
 )
 
 func RegisterRouteAPI(app *fiber.App) {
+	// set prefix api
+	groupApi := app.Group("/api")
+
 	// register route in controller
 	user := controllers.NewUserController()
-	user.Route(app)
+	user.Route(groupApi)
 
 	// list all routes
 	pkg.ListRouters(app)

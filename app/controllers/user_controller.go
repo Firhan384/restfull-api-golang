@@ -21,9 +21,9 @@ func NewUserController() userController {
 	return userController{service: service}
 }
 
-func (c userController) Route(app *fiber.App) {
-	app.Get("/api/user", c.getUsers)
-	app.Post("/api/user", c.createUser)
+func (c userController) Route(app fiber.Router) {
+	app.Get("/user", c.getUsers)
+	app.Post("/user", c.createUser)
 }
 
 func (c userController) getUsers(ctx *fiber.Ctx) error {
