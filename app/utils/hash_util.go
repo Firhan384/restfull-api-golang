@@ -11,5 +11,5 @@ func TextHash(text string) string {
 
 func CompareHash(text, hash string) bool {
 	isCompare := bcrypt.CompareHashAndPassword([]byte(hash), []byte(text))
-	return isCompare != nil
+	return isCompare == nil
 }
